@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AdminNav } from "@/components/admin-nav";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface SiteSettings {
   storeName: string;
@@ -104,6 +105,8 @@ export default function SettingsPage() {
     }
   }
 
+  const { startUpload } = useUploadThing("productImage");
+
   async function handleUpload(
     file: File,
     field: "storeLogo" | "storeFavicon",
@@ -111,12 +114,9 @@ export default function SettingsPage() {
   ) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setSettings((prev) => ({ ...prev, [field]: data.url }));
+      const res = await startUpload([file]);
+      if (!res?.[0]?.url) throw new Error("Erro ao enviar imagem");
+      setSettings((prev) => ({ ...prev, [field]: res[0].url }));
     } catch (err: any) {
       setError(err.message || "Erro ao enviar imagem");
     } finally {

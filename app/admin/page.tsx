@@ -33,6 +33,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { formatPrice, calculateDiscountedPrice } from "@/lib/utils";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface Product {
   id: string;
@@ -74,6 +75,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const { startUpload } = useUploadThing("productImage");
 
   useEffect(() => {
     fetchData();
@@ -480,15 +482,9 @@ export default function AdminPage() {
                         if (!file) return;
                         setUploading(true);
                         try {
-                          const fd = new FormData();
-                          fd.append("file", file);
-                          const res = await fetch("/api/upload", {
-                            method: "POST",
-                            body: fd,
-                          });
-                          const data = await res.json();
-                          if (!res.ok) throw new Error(data.error);
-                          setFormData((prev) => ({ ...prev, image: data.url }));
+                          const res = await startUpload([file]);
+                          if (!res?.[0]?.url) throw new Error("Erro ao enviar imagem");
+                          setFormData((prev) => ({ ...prev, image: res[0].url }));
                         } catch (err: any) {
                           setError(err.message || "Erro ao enviar imagem");
                         } finally {

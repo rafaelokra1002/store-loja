@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -17,6 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function DownloadPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-neon-green" /></div>}>
+      <DownloadContent />
+    </Suspense>
+  );
+}
+
+function DownloadContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 

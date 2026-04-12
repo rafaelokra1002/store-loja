@@ -5,13 +5,13 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Criar admin padrão
-  const hashedPassword = await bcrypt.hash("admin123", 12);
+  const hashedPassword = await bcrypt.hash("Okra1259918@", 12);
   
   await prisma.user.upsert({
-    where: { email: "admin@lojinha.com" },
-    update: {},
+    where: { email: "okra1002@gmail.com" },
+    update: { password: hashedPassword },
     create: {
-      email: "admin@lojinha.com",
+      email: "okra1002@gmail.com",
       name: "Admin",
       password: hashedPassword,
       role: "ADMIN",
@@ -94,8 +94,8 @@ async function main() {
   }
 
   console.log("✅ Seed executado com sucesso!");
-  console.log("📧 Admin: admin@lojinha.com");
-  console.log("🔑 Senha: admin123");
+  console.log("📧 Admin: okra1002@gmail.com");
+  console.log("🔑 Senha: Okra1259918@");
 }
 
 main()

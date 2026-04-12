@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a0a10"/>
+      <stop offset="50%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#0a1a15"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#ff6b9d"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="spot" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#spot)"/>
+  <!-- Instagram-style camera icon -->
+  <g transform="translate(400,150)" filter="url(#glow)">
+    <rect x="-45" y="-45" width="90" height="90" rx="22" fill="none" stroke="#f43f5e" stroke-width="3"/>
+    <circle cx="0" cy="0" r="25" fill="none" stroke="#f43f5e" stroke-width="3"/>
+    <circle cx="30" cy="-30" r="6" fill="#f43f5e"/>
+  </g>
+  <!-- Decorative -->
+  <circle cx="620" cy="130" r="30" fill="#f43f5e" opacity="0.06"/>
+  <circle cx="180" cy="370" r="20" fill="#ff6b9d" opacity="0.05"/>
+  <!-- Text -->
+  <text x="400" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="36" fill="white" letter-spacing="2">AUTOMAÇÃO</text>
+  <text x="400" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="42" fill="url(#accent)" letter-spacing="3">INSTAGRAM</text>
+  <text x="400" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#888" letter-spacing="4">POSTS • DMs • MÉTRICAS</text>
+  <!-- Badge -->
+  <rect x="300" y="400" width="200" height="36" rx="18" fill="#f43f5e" opacity="0.9"/>
+  <text x="400" y="424" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#fff">📊 SOCIAL MEDIA</text>
+</svg>

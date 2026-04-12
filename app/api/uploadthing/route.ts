@@ -3,9 +3,4 @@ import { ourFileRouter } from "./core";
 
 export const { GET, POST } = createRouteHandler({
   router: ourFileRouter,
-  config: {
-    callbackUrl: process.env.NEXT_PUBLIC_APP_URL
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/uploadthing`
-      : undefined,
-  },
 });

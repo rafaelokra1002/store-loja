@@ -8,10 +8,15 @@ export const ourFileRouter = {
   productImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     .middleware(async () => {
       const session = await getServerSession(authOptions);
-      if (session?.user?.role !== "ADMIN") throw new Error("Não autorizado");
+      console.log("[UploadThing] session:", JSON.stringify(session?.user));
+      if (session?.user?.role !== "ADMIN") {
+        console.log("[UploadThing] Rejeitado - role:", session?.user?.role);
+        throw new Error("Não autorizado");
+      }
       return { userId: session.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
+      console.log("[UploadThing] Upload completo:", file.url);
       return { url: file.url };
     }),
 } satisfies FileRouter;

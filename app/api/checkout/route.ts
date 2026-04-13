@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
     }
 
+    if (product.stock === 0) {
+      return NextResponse.json({ error: "Produto esgotado" }, { status: 400 });
+    }
+
     if (!product.driveLink) {
       return NextResponse.json(
         { error: "Este produto não possui link de download configurado" },

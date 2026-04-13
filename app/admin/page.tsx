@@ -43,6 +43,7 @@ interface Product {
   discount: number;
   image: string;
   category: string;
+  stock: number;
   createdAt: string;
 }
 
@@ -60,6 +61,7 @@ const emptyProduct = {
   discount: 0,
   image: "",
   driveLink: "",
+  stock: -1,
 };
 
 export default function AdminPage() {
@@ -114,6 +116,7 @@ export default function AdminPage() {
       discount: product.discount,
       image: product.image,
       driveLink: (product as any).driveLink || "",
+      stock: product.stock ?? -1,
     });
     setError("");
     setDialogOpen(true);
@@ -274,6 +277,9 @@ export default function AdminPage() {
                     <th className="text-left p-4 text-sm font-medium text-zinc-400">
                       Final
                     </th>
+                    <th className="text-left p-4 text-sm font-medium text-zinc-400">
+                      Estoque
+                    </th>
                     <th className="text-right p-4 text-sm font-medium text-zinc-400">
                       Ações
                     </th>
@@ -321,6 +327,15 @@ export default function AdminPage() {
                             product.price,
                             product.discount
                           )
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {product.stock === -1 ? (
+                          <span className="text-sm text-zinc-400">∞</span>
+                        ) : product.stock === 0 ? (
+                          <span className="text-sm text-red-400 font-medium">Esgotado</span>
+                        ) : (
+                          <span className="text-sm text-zinc-300">{product.stock}</span>
                         )}
                       </td>
                       <td className="p-4">
@@ -516,6 +531,26 @@ export default function AdminPage() {
                 />
                 <p className="text-xs text-zinc-500">
                   Link do arquivo no Google Drive que o cliente receberá após o pagamento.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="stock">
+                  <Package className="h-3 w-3 inline mr-1" />
+                  Estoque
+                </Label>
+                <Input
+                  id="stock"
+                  type="number"
+                  value={formData.stock === -1 ? "" : formData.stock}
+                  onChange={(e) =>
+                    setFormData({ ...formData, stock: e.target.value === "" ? -1 : parseInt(e.target.value) })
+                  }
+                  placeholder="Ilimitado"
+                  min={0}
+                />
+                <p className="text-xs text-zinc-500">
+                  Quantidade disponível. Deixe vazio para estoque ilimitado.
                 </p>
               </div>
 

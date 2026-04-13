@@ -17,6 +17,7 @@ interface Product {
   discount: number;
   image: string;
   category: string;
+  stock: number;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {

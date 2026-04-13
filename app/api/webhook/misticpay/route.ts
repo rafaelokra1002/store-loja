@@ -36,6 +36,19 @@ export async function POST(request: NextRequest) {
         where: { id: order.id },
         data: { status: mappedStatus },
       });
+
+      // Dar baixa no estoque quando pagamento confirmado
+      if (mappedStatus === "COMPLETO") {
+        const product = await prisma.product.findUnique({
+          where: { id: order.productId },
+        });
+        if (product && product.stock > 0) {
+          await prisma.product.update({
+            where: { id: order.productId },
+            data: { stock: product.stock - 1 },
+          });
+        }
+      }
     }
 
     return NextResponse.json({ received: true });

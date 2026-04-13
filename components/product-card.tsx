@@ -14,6 +14,7 @@ interface ProductCardProps {
   discount: number;
   image: string;
   category: string;
+  stock?: number;
 }
 
 export function ProductCard({
@@ -24,6 +25,7 @@ export function ProductCard({
   discount,
   image,
   category,
+  stock,
 }: ProductCardProps) {
   const finalPrice = calculateDiscountedPrice(price, discount);
 
@@ -78,12 +80,18 @@ export function ProductCard({
         </div>
 
         {/* Buy button */}
-        <Link href={`/checkout?product=${id}`}>
-          <Button className="w-full gap-2" size="sm">
-            <ShoppingCart className="h-4 w-4" />
-            Comprar
+        {stock === 0 ? (
+          <Button className="w-full gap-2" size="sm" disabled>
+            Esgotado
           </Button>
-        </Link>
+        ) : (
+          <Link href={`/checkout?product=${id}`}>
+            <Button className="w-full gap-2" size="sm">
+              <ShoppingCart className="h-4 w-4" />
+              Comprar
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );

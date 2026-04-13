@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { ParticleBackground } from "@/components/particle-background";
 import { WhatsAppFloat } from "@/components/whatsapp-float";
+import { SalesNotification } from "@/components/sales-notification";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,6 +25,7 @@ export default function RootLayout({
         <ParticleBackground />
         <Providers>{children}</Providers>
         <WhatsAppFloat />
+        <SalesNotification />
       </body>
     </html>
   );

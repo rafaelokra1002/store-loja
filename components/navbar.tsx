@@ -31,15 +31,6 @@ export function Navbar() {
             </Button>
           </Link>
 
-          {session?.user?.role === "ADMIN" && (
-            <Link href="/admin">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Shield className="h-4 w-4" />
-                Admin
-              </Button>
-            </Link>
-          )}
-
           {session ? (
             <Button
               variant="ghost"

@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import { Globe, LogIn, LogOut, Shield, Search } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/components/site-settings-provider";
 
 export function Navbar() {
-  const { data: session } = useSession();
   const settings = useSiteSettings();
 
   return (
@@ -30,25 +28,6 @@ export function Navbar() {
               Produtos
             </Button>
           </Link>
-
-          {session ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => signOut()}
-              className="gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sair
-            </Button>
-          ) : (
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="gap-2">
-                <LogIn className="h-4 w-4" />
-                Login
-              </Button>
-            </Link>
-          )}
         </div>
       </div>
     </nav>

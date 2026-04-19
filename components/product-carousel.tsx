@@ -77,7 +77,7 @@ export function ProductCarousel({ products }: { products: Product[] }) {
 
         {/* Main slide */}
         <div className="w-full md:w-[70%] flex-shrink-0 relative">
-          <div className="relative aspect-[16/8] md:aspect-[16/7] w-full overflow-hidden rounded-2xl border border-zinc-700/50 shadow-2xl shadow-black/60">
+          <div className="relative aspect-[16/9] md:aspect-[16/8] w-full overflow-hidden rounded-2xl border border-zinc-700/50 shadow-2xl shadow-black/60">
             {products.map((product, i) => (
               <div
                 key={product.id}

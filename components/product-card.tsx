@@ -5,6 +5,11 @@ import Link from "next/link";
 import { ShoppingCart, Percent, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice, calculateDiscountedPrice } from "@/lib/utils";
+import {
+  normalizeProductCategory,
+  OTHER_PRODUCT_CATEGORY_THEME,
+  PRODUCT_CATEGORY_THEME,
+} from "@/lib/product-categories";
 
 interface ProductCardProps {
   id: string;
@@ -28,6 +33,11 @@ export function ProductCard({
   stock,
 }: ProductCardProps) {
   const finalPrice = calculateDiscountedPrice(price, discount);
+  const normalizedCategory = normalizeProductCategory(category);
+  const displayCategory = normalizedCategory ?? category;
+  const categoryTheme = normalizedCategory
+    ? PRODUCT_CATEGORY_THEME[normalizedCategory]
+    : OTHER_PRODUCT_CATEGORY_THEME;
 
   return (
     <div className="group relative rounded-xl border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-neon-green/30 hover:shadow-[0_0_30px_rgba(0,255,136,0.1)] hover:-translate-y-1">
@@ -59,6 +69,10 @@ export function ProductCard({
 
       {/* Content */}
       <div className="p-4">
+        <div className={`mb-3 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${categoryTheme.cardBadgeClass}`}>
+          {displayCategory}
+        </div>
+
         <Link href={`/produto/${id}`}>
           <h3 className="text-lg font-semibold text-zinc-100 mb-2 line-clamp-1 group-hover:text-neon-green transition-colors">
             {name}

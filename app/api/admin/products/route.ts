@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_PRODUCT_CATEGORY, PRODUCT_CATEGORIES } from "@/lib/product-categories";
 import { z } from "zod";
 
 const productSchema = z.object({
@@ -10,7 +11,7 @@ const productSchema = z.object({
   price: z.number().positive("Preço deve ser positivo"),
   discount: z.number().min(0).max(100).default(0),
   image: z.string().default(""),
-  category: z.string().default("Geral"),
+  category: z.enum(PRODUCT_CATEGORIES).default(DEFAULT_PRODUCT_CATEGORY),
   driveLink: z.string().default(""),
 });
 

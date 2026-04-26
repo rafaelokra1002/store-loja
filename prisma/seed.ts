@@ -4,19 +4,33 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Criar admin padrão
-  const hashedPassword = await bcrypt.hash("Okra1259918@", 12);
-  
-  await prisma.user.upsert({
-    where: { email: "okra1002@gmail.com" },
-    update: { password: hashedPassword },
-    create: {
-      email: "okra1002@gmail.com",
-      name: "Admin",
-      password: hashedPassword,
-      role: "ADMIN",
-    },
-  });
+  const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim();
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD?.trim();
+
+  if (adminEmail && adminPassword) {
+    if (adminPassword.length < 12) {
+      throw new Error("SEED_ADMIN_PASSWORD deve ter pelo menos 12 caracteres");
+    }
+
+    const hashedPassword = await bcrypt.hash(adminPassword, 12);
+
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { password: hashedPassword },
+      create: {
+        email: adminEmail,
+        name: "Admin",
+        password: hashedPassword,
+        role: "ADMIN",
+      },
+    });
+
+    console.log(`📧 Admin seeded: ${adminEmail}`);
+  } else {
+    console.log(
+      "⚠️ Seed admin ignorado. Defina SEED_ADMIN_EMAIL e SEED_ADMIN_PASSWORD para criar o usuario administrador."
+    );
+  }
 
   // Produtos de exemplo
   const products = [
@@ -26,7 +40,7 @@ async function main() {
       price: 89.90,
       discount: 20,
       image: "/products/discord-moderacao.svg",
-      category: "Discord",
+      category: "Bots",
     },
     {
       name: "Bot WhatsApp Atendimento",
@@ -34,7 +48,7 @@ async function main() {
       price: 149.90,
       discount: 15,
       image: "/products/whatsapp-atendimento.svg",
-      category: "WhatsApp",
+      category: "Bots",
     },
     {
       name: "Bot Telegram Vendas",
@@ -42,7 +56,7 @@ async function main() {
       price: 129.90,
       discount: 10,
       image: "/products/telegram-vendas.svg",
-      category: "Telegram",
+      category: "Bots",
     },
     {
       name: "Bot Discord Música Premium",
@@ -50,7 +64,7 @@ async function main() {
       price: 59.90,
       discount: 25,
       image: "/products/discord-musica.svg",
-      category: "Discord",
+      category: "Streamings",
     },
     {
       name: "Automação Instagram",
@@ -58,7 +72,7 @@ async function main() {
       price: 199.90,
       discount: 30,
       image: "/products/automacao-instagram.svg",
-      category: "Automação",
+      category: "Ferramentas",
     },
     {
       name: "Bot WhatsApp Grupo Manager",
@@ -66,7 +80,7 @@ async function main() {
       price: 79.90,
       discount: 0,
       image: "/products/whatsapp-grupo.svg",
-      category: "WhatsApp",
+      category: "Bots",
     },
     {
       name: "Bot Discord RPG Game",
@@ -74,7 +88,7 @@ async function main() {
       price: 119.90,
       discount: 10,
       image: "/products/discord-rpg.svg",
-      category: "Discord",
+      category: "Bots",
     },
     {
       name: "Bot Telegram Notícias",
@@ -82,7 +96,7 @@ async function main() {
       price: 69.90,
       discount: 5,
       image: "/products/telegram-noticias.svg",
-      category: "Telegram",
+      category: "Metodos",
     },
   ];
 
@@ -94,8 +108,6 @@ async function main() {
   }
 
   console.log("✅ Seed executado com sucesso!");
-  console.log("📧 Admin: okra1002@gmail.com");
-  console.log("🔑 Senha: Okra1259918@");
 }
 
 main()

@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bot,
   Package,
@@ -11,12 +9,12 @@ import {
   Plus,
   Pencil,
   Trash2,
-  ArrowLeft,
-  BarChart3,
-  Image as ImageIcon,
   Upload,
   X,
   Link2,
+  Search,
+  ArrowUpDown,
+  Layers3,
 } from "lucide-react";
 import { AdminNav } from "@/components/admin-nav";
 import { Button } from "@/components/ui/button";
@@ -24,6 +22,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DEFAULT_PRODUCT_CATEGORY,
+  normalizeProductCategory,
+  ProductCategory,
+  PRODUCT_CATEGORIES,
+} from "@/lib/product-categories";
 import {
   Dialog,
   DialogContent,
@@ -60,12 +64,25 @@ const emptyProduct = {
   price: 0,
   discount: 0,
   image: "",
+  category: DEFAULT_PRODUCT_CATEGORY,
   driveLink: "",
   stock: -1,
 };
 
+interface ProductFormData {
+  name: string;
+  description: string;
+  price: number;
+  discount: number;
+  image: string;
+  category: ProductCategory;
+  driveLink: string;
+  stock: number;
+}
+
+type SortOption = "recent" | "price-desc" | "price-asc" | "discount" | "stock";
+
 export default function AdminPage() {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,10 +90,13 @@ export default function AdminPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState(emptyProduct);
+  const [formData, setFormData] = useState<ProductFormData>(emptyProduct);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | ProductCategory>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("recent");
   const { startUpload } = useUploadThing("productImage");
 
   useEffect(() => {
@@ -115,6 +135,7 @@ export default function AdminPage() {
       price: product.price,
       discount: product.discount,
       image: product.image,
+      category: normalizeProductCategory(product.category) ?? DEFAULT_PRODUCT_CATEGORY,
       driveLink: (product as any).driveLink || "",
       stock: product.stock ?? -1,
     });
@@ -180,6 +201,52 @@ export default function AdminPage() {
       console.error(err);
     }
   }
+
+  const visibleProducts = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    return [...products]
+      .filter((product) => {
+        const normalizedCategory = normalizeProductCategory(product.category) ?? product.category;
+        const matchesCategory =
+          categoryFilter === "all" || normalizedCategory === categoryFilter;
+
+        if (!matchesCategory) {
+          return false;
+        }
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return (
+          product.name.toLowerCase().includes(normalizedSearch) ||
+          product.description.toLowerCase().includes(normalizedSearch) ||
+          normalizedCategory.toLowerCase().includes(normalizedSearch)
+        );
+      })
+      .sort((left, right) => {
+        switch (sortBy) {
+          case "price-desc":
+            return right.price - left.price;
+          case "price-asc":
+            return left.price - right.price;
+          case "discount":
+            return right.discount - left.discount;
+          case "stock":
+            return (left.stock === -1 ? Number.MAX_SAFE_INTEGER : left.stock) -
+              (right.stock === -1 ? Number.MAX_SAFE_INTEGER : right.stock);
+          case "recent":
+          default:
+            return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+        }
+      });
+  }, [categoryFilter, products, search, sortBy]);
+
+  const lowStockCount = useMemo(
+    () => products.filter((product) => product.stock > 0 && product.stock <= 5).length,
+    [products]
+  );
 
   if (loading) {
     return (
@@ -247,17 +314,93 @@ export default function AdminPage() {
               </CardContent>
             </Card>
 
+            <Card className="border-zinc-800 hover:border-fuchsia-500/20 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-zinc-400">
+                  Categorias Ativas
+                </CardTitle>
+                <Layers3 className="h-5 w-5 text-fuchsia-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-zinc-100">
+                  {stats.categories.length}
+                </div>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {lowStockCount} com estoque baixo
+                </p>
+              </CardContent>
+            </Card>
+
           </div>
         )}
 
         {/* Products list */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-zinc-100">Produtos</h2>
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-100">Produtos</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              {visibleProducts.length} item{visibleProducts.length === 1 ? "" : "s"} exibido{visibleProducts.length === 1 ? "" : "s"} no painel.
+            </p>
+          </div>
           <Button onClick={openCreateDialog} className="gap-2">
             <Plus className="h-4 w-4" />
             Novo Produto
           </Button>
         </div>
+
+        <Card className="mb-4 border-zinc-800">
+          <CardContent className="grid gap-4 p-4 md:grid-cols-[1.3fr_0.8fr_0.8fr]">
+            <div className="space-y-2">
+              <Label htmlFor="product-search">Buscar</Label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                <Input
+                  id="product-search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por nome, descricao ou categoria"
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category-filter">Categoria</Label>
+              <select
+                id="category-filter"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value as "all" | ProductCategory)}
+                className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-green/40 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="all">Todas as categorias</option>
+                {PRODUCT_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sort-by">Ordenar por</Label>
+              <div className="relative">
+                <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                <select
+                  id="sort-by"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-950 pl-10 pr-3 py-2 text-sm text-zinc-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-green/40 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="recent">Mais recentes</option>
+                  <option value="price-desc">Maior preco</option>
+                  <option value="price-asc">Menor preco</option>
+                  <option value="discount">Maior desconto</option>
+                  <option value="stock">Menor estoque</option>
+                </select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="border-zinc-800">
           <CardContent className="p-0">
@@ -270,6 +413,9 @@ export default function AdminPage() {
                     </th>
                     <th className="text-left p-4 text-sm font-medium text-zinc-400">
                       Preço
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-zinc-400">
+                      Categoria
                     </th>
                     <th className="text-left p-4 text-sm font-medium text-zinc-400">
                       Desconto
@@ -286,7 +432,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
+                  {visibleProducts.map((product) => (
                     <tr
                       key={product.id}
                       className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors"
@@ -311,6 +457,11 @@ export default function AdminPage() {
                       </td>
                       <td className="p-4 text-sm text-zinc-300">
                         {formatPrice(product.price)}
+                      </td>
+                      <td className="p-4 text-sm text-zinc-300">
+                        <span className="inline-flex rounded-full border border-zinc-700 bg-zinc-800/70 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.16em] text-zinc-300">
+                          {normalizeProductCategory(product.category) ?? product.category}
+                        </span>
                       </td>
                       <td className="p-4">
                         {product.discount > 0 ? (
@@ -363,10 +514,10 @@ export default function AdminPage() {
                 </tbody>
               </table>
 
-              {products.length === 0 && (
+              {visibleProducts.length === 0 && (
                 <div className="text-center py-12">
                   <Package className="h-12 w-12 text-zinc-700 mx-auto mb-3" />
-                  <p className="text-zinc-500">Nenhum produto cadastrado</p>
+                  <p className="text-zinc-500">Nenhum produto encontrado com os filtros atuais</p>
                 </div>
               )}
             </div>
@@ -456,6 +607,27 @@ export default function AdminPage() {
                     }
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Categoria</Label>
+                <select
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      category: e.target.value as ProductCategory,
+                    })
+                  }
+                  className="flex h-10 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-green/40 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {PRODUCT_CATEGORIES.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2">

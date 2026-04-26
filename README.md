@@ -21,12 +21,19 @@ npm install
 
 ### 2. Configurar banco de dados
 
-Certifique-se de ter PostgreSQL rodando e configure a `DATABASE_URL` no arquivo `.env`:
+Certifique-se de ter PostgreSQL rodando e configure o arquivo `.env` com base em `.env.example`:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/lojinha_bots"
-NEXTAUTH_SECRET="sua-secret-key"
+NEXTAUTH_SECRET="gere-uma-chave-aleatoria-com-pelo-menos-32-caracteres"
 NEXTAUTH_URL="http://localhost:3000"
+UPLOADTHING_TOKEN=""
+MISTICPAY_CLIENT_ID=""
+MISTICPAY_CLIENT_SECRET=""
+MISTICPAY_WEBHOOK_URL="http://localhost:3000/api/webhook/misticpay"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+SEED_ADMIN_EMAIL="admin@localhost.local"
+SEED_ADMIN_PASSWORD="troque-esta-senha-local-antes-de-usar"
 ```
 
 ### 3. Rodar migrations e seed
@@ -44,8 +51,18 @@ Acesse: [http://localhost:3000](http://localhost:3000)
 
 ## 🔑 Login Admin
 
-- **Email:** admin@lojinha.com
-- **Senha:** admin123
+O seed nao usa mais credenciais hardcoded.
+
+Defina `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` antes de rodar o seed para criar o administrador local.
+
+Troque qualquer senha de ambiente antes de publicar a loja.
+
+## 🔒 Segurança
+
+- Nunca publique o arquivo `.env`.
+- Gere um `NEXTAUTH_SECRET` forte e aleatorio.
+- Use credenciais exclusivas para producao.
+- Se algum segredo ja foi exposto, rotacione-o no provedor antes do deploy.
 
 ## 📁 Estrutura
 

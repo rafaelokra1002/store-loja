@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PRODUCT_CATEGORIES } from "@/lib/product-categories";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -10,7 +11,7 @@ const updateSchema = z.object({
   price: z.number().positive().optional(),
   discount: z.number().min(0).max(100).optional(),
   image: z.string().optional(),
-  category: z.string().optional(),
+  category: z.enum(PRODUCT_CATEGORIES).optional(),
   driveLink: z.string().optional(),
 });
 

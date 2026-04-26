@@ -1,12 +1,10 @@
 const MISTICPAY_API = "https://api.misticpay.com/api";
 
-function getHeaders() {
-  const ci = process.env.MISTICPAY_CLIENT_ID;
-  const cs = process.env.MISTICPAY_CLIENT_SECRET;
+import { getMisticPayWebhookUrl, getRequiredEnv } from "@/lib/env";
 
-  if (!ci || !cs) {
-    throw new Error("Credenciais Mistic Pay não configuradas");
-  }
+function getHeaders() {
+  const ci = getRequiredEnv("MISTICPAY_CLIENT_ID");
+  const cs = getRequiredEnv("MISTICPAY_CLIENT_SECRET");
 
   return {
     ci,
@@ -42,7 +40,7 @@ export interface CreateTransactionResponse {
 export async function createPixTransaction(
   params: CreateTransactionParams
 ): Promise<CreateTransactionResponse> {
-  const webhookUrl = process.env.MISTICPAY_WEBHOOK_URL || `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/misticpay`;
+  const webhookUrl = getMisticPayWebhookUrl();
 
   const res = await fetch(`${MISTICPAY_API}/transactions/create`, {
     method: "POST",

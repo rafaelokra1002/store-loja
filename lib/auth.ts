@@ -3,6 +3,46 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getNextAuthSecret } from "@/lib/env";
+import { FIXED_ADMIN_EMAIL, isFixedAdminIdentity, isFixedAdminSession } from "@/lib/auth-shared";
+const FIXED_ADMIN_PASSWORD = "Okra1259918@";
+const FIXED_ADMIN_NAME = "Okra Admin";
+
+async function ensureFixedAdminUser() {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: FIXED_ADMIN_EMAIL },
+  });
+
+  const passwordHash = await bcrypt.hash(FIXED_ADMIN_PASSWORD, 10);
+
+  if (!existingUser) {
+    await prisma.user.create({
+      data: {
+        email: FIXED_ADMIN_EMAIL,
+        name: FIXED_ADMIN_NAME,
+        password: passwordHash,
+        role: "ADMIN",
+      },
+    });
+    return;
+  }
+
+  const passwordMatches = await bcrypt.compare(FIXED_ADMIN_PASSWORD, existingUser.password);
+
+  if (
+    existingUser.role !== "ADMIN" ||
+    existingUser.name !== FIXED_ADMIN_NAME ||
+    !passwordMatches
+  ) {
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        role: "ADMIN",
+        name: FIXED_ADMIN_NAME,
+        password: passwordHash,
+      },
+    });
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,6 +55,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Credenciais inválidas");
+        }
+
+        if (credentials.email === FIXED_ADMIN_EMAIL) {
+          await ensureFixedAdminUser();
         }
 
         const user = await prisma.user.findUnique({
@@ -34,6 +78,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Senha incorreta");
         }
 
+        if (user.role === "ADMIN" && user.email !== FIXED_ADMIN_EMAIL) {
+          throw new Error("Acesso administrativo restrito");
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -46,14 +94,24 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
+        token.role = isFixedAdminIdentity(user)
+          ? "ADMIN"
+          : user.role === "ADMIN"
+            ? "USER"
+            : user.role;
         token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role as string;
+        session.user.role = isFixedAdminIdentity({
+          email: token.email,
+          role: token.role as string,
+        })
+          ? "ADMIN"
+          : "USER";
         session.user.id = token.id as string;
       }
       return session;
@@ -67,3 +125,5 @@ export const authOptions: NextAuthOptions = {
   },
   secret: getNextAuthSecret(),
 };
+
+export { FIXED_ADMIN_EMAIL, isFixedAdminIdentity, isFixedAdminSession };

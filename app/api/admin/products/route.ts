@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions, isFixedAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_PRODUCT_CATEGORY, PRODUCT_CATEGORIES } from "@/lib/product-categories";
 import { z } from "zod";
@@ -17,7 +17,7 @@ const productSchema = z.object({
 
 async function isAdmin() {
   const session = await getServerSession(authOptions);
-  return session?.user?.role === "ADMIN";
+  return isFixedAdminSession(session);
 }
 
 export async function GET() {

@@ -15,6 +15,7 @@ import { ProductCard } from "@/components/product-card";
 import { ProductCardSkeleton } from "@/components/product-card-skeleton";
 import { SearchAndFilter } from "@/components/search-and-filter";
 import { ProductCarousel } from "@/components/product-carousel";
+import { TestimonialsStrip } from "@/components/testimonials-strip";
 import {
   normalizeProductCategory,
   OTHER_PRODUCT_CATEGORY_THEME,
@@ -200,6 +201,8 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        <TestimonialsStrip />
 
         <section id="produtos" className="py-16">
           <div className="container mx-auto px-4">

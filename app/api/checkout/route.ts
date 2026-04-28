@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 import { createPixTransaction } from "@/lib/misticpay";
 import { calculateDiscountedPrice } from "@/lib/utils";
 import { randomBytes } from "crypto";
@@ -14,6 +16,7 @@ const checkoutSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
     const body = await request.json();
     const data = checkoutSchema.parse(body);
 
@@ -50,6 +53,7 @@ export async function POST(request: NextRequest) {
 
     const order = await prisma.order.create({
       data: {
+        userId: session?.user?.id,
         productId: product.id,
         payerName: data.payerName,
         payerEmail: data.payerEmail,

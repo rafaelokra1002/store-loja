@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Globe, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +35,10 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Email ou senha incorretos");
     } else {
-      router.push("/admin");
+      const sessionRes = await fetch("/api/auth/session");
+      const session = await sessionRes.json();
+      const target = session?.user?.role === "ADMIN" ? "/admin" : "/minhas-compras";
+      router.push(target);
       router.refresh();
     }
   }
@@ -58,7 +62,7 @@ export default function LoginPage() {
             </span>
           </CardTitle>
           <CardDescription>
-            Faça login para acessar o painel administrativo
+            Entre na sua conta para acompanhar pedidos e acessar suas compras salvas
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,6 +102,13 @@ export default function LoginPage() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-zinc-400">
+            Ainda não tem conta?{" "}
+            <Link href="/cadastro" className="text-neon-green hover:underline">
+              Criar cadastro
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

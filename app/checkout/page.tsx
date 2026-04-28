@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -57,6 +58,7 @@ export default function CheckoutPage() {
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("product");
+  const { data: session } = useSession();
 
   const [step, setStep] = useState<Step>("form");
   const [product, setProduct] = useState<Product | null>(null);
@@ -71,6 +73,15 @@ function CheckoutContent() {
   const [payerName, setPayerName] = useState("");
   const [payerEmail, setPayerEmail] = useState("");
   const [payerDocument, setPayerDocument] = useState("");
+
+  useEffect(() => {
+    if (!session?.user) {
+      return;
+    }
+
+    setPayerName((currentValue) => currentValue || session.user.name || "");
+    setPayerEmail((currentValue) => currentValue || session.user.email || "");
+  }, [session]);
 
   useEffect(() => {
     if (!productId) return;

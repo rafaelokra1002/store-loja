@@ -1,6 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions, isFixedAdminSession } from "@/lib/auth";
 
 const f = createUploadthing();
 
@@ -9,11 +9,11 @@ export const ourFileRouter = {
     .middleware(async () => {
       const session = await getServerSession(authOptions);
       console.log("[UploadThing] session:", JSON.stringify(session?.user));
-      if (session?.user?.role !== "ADMIN") {
+      if (!isFixedAdminSession(session)) {
         console.log("[UploadThing] Rejeitado - role:", session?.user?.role);
         throw new Error("Não autorizado");
       }
-      return { userId: session.user.id };
+      return { userId: session!.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("[UploadThing] Upload completo:", file.url);

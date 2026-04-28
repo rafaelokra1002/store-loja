@@ -23,6 +23,19 @@ export function ParticleBackground() {
     let animationId: number;
     let particles: Particle[] = [];
 
+    function getAccentRgb() {
+      const accent = getComputedStyle(document.documentElement)
+        .getPropertyValue("--site-accent-rgb")
+        .trim();
+
+      return accent || "0 255 136";
+    }
+
+    function toRgba(accentRgb: string, opacity: number) {
+      const [red = "0", green = "255", blue = "136"] = accentRgb.split(/\s+/);
+      return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+    }
+
     function resize() {
       canvas!.width = window.innerWidth;
       canvas!.height = window.innerHeight;
@@ -46,6 +59,7 @@ export function ParticleBackground() {
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
       const maxDist = 150;
+      const accentRgb = getAccentRgb();
 
       // Draw connections
       for (let i = 0; i < particles.length; i++) {
@@ -57,7 +71,7 @@ export function ParticleBackground() {
           if (dist < maxDist) {
             const opacity = (1 - dist / maxDist) * 0.35;
             ctx!.beginPath();
-            ctx!.strokeStyle = `rgba(0, 255, 136, ${opacity})`;
+            ctx!.strokeStyle = toRgba(accentRgb, opacity);
             ctx!.lineWidth = 0.6;
             ctx!.moveTo(particles[i].x, particles[i].y);
             ctx!.lineTo(particles[j].x, particles[j].y);
@@ -70,8 +84,8 @@ export function ParticleBackground() {
       for (const p of particles) {
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx!.fillStyle = "rgba(0, 255, 136, 0.7)";
-        ctx!.shadowColor = "rgba(0, 255, 136, 0.5)";
+        ctx!.fillStyle = toRgba(accentRgb, 0.7);
+        ctx!.shadowColor = toRgba(accentRgb, 0.5);
         ctx!.shadowBlur = 6;
         ctx!.fill();
         ctx!.shadowBlur = 0;

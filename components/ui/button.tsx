@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-neon-green text-black hover:bg-neon-green/90 shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_30px_rgba(0,255,136,0.5)]",
+          "bg-neon-green text-black hover:bg-neon-green/90 shadow-[0_0_20px_rgb(var(--site-accent-rgb)_/_0.3)] hover:shadow-[0_0_30px_rgb(var(--site-accent-rgb)_/_0.5)]",
         destructive:
           "bg-red-600 text-white hover:bg-red-700",
         outline:
@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100",
         link: "text-neon-green underline-offset-4 hover:underline",
-        neon: "bg-gradient-to-r from-neon-green to-neon-blue text-black font-bold hover:opacity-90 shadow-[0_0_25px_rgba(0,255,136,0.4)]",
+        neon: "bg-gradient-to-r from-neon-green to-neon-blue text-black font-bold hover:opacity-90 shadow-[0_0_25px_rgb(var(--site-accent-rgb)_/_0.4)]",
       },
       size: {
         default: "h-10 px-4 py-2",

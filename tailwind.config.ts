@@ -24,7 +24,7 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         neon: {
-          green: "#00ff88",
+          green: "hsl(var(--primary) / <alpha-value>)",
           blue: "#00d4ff",
           purple: "#a855f7",
         },
@@ -60,8 +60,8 @@ const config: Config = {
       },
       keyframes: {
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(0, 255, 136, 0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(0, 255, 136, 0.6)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgb(var(--site-accent-rgb) / 0.3)" },
+          "50%": { boxShadow: "0 0 40px rgb(var(--site-accent-rgb) / 0.6)" },
         },
         "fade-in": {
           "0%": { opacity: "0", transform: "translateY(10px)" },

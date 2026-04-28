@@ -9,6 +9,7 @@
     --card: 0 0% 7%;
     --card-foreground: 0 0% 98%;
     --primary: 152 100% 50%;
+    --site-accent-rgb: 0 255 136;
     --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
@@ -53,7 +54,7 @@
 
 @layer utilities {
   .text-glow-green {
-    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    text-shadow: 0 0 20px rgb(var(--site-accent-rgb) / 0.5);
   }
 
   .text-glow-blue {

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
+import { getAuthOptions } from "@/lib/auth";
 import { createPixTransaction } from "@/lib/misticpay";
 import { calculateDiscountedPrice } from "@/lib/utils";
 import { randomBytes } from "crypto";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 const checkoutSchema = z.object({
   productId: z.string().min(1),
@@ -16,7 +18,7 @@ const checkoutSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(getAuthOptions());
     const body = await request.json();
     const data = checkoutSchema.parse(body);
 

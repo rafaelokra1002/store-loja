@@ -32,8 +32,8 @@ MISTICPAY_CLIENT_ID=""
 MISTICPAY_CLIENT_SECRET=""
 MISTICPAY_WEBHOOK_URL="http://localhost:3000/api/webhook/misticpay"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-SEED_ADMIN_EMAIL="admin@localhost.local"
-SEED_ADMIN_PASSWORD="troque-esta-senha-local-antes-de-usar"
+SEED_ADMIN_EMAIL="admin"
+SEED_ADMIN_PASSWORD="admin123"
 ```
 
 ### 3. Rodar migrations e seed
@@ -54,6 +54,8 @@ Acesse: [http://localhost:3000](http://localhost:3000)
 O seed nao usa mais credenciais hardcoded.
 
 Defina `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` antes de rodar o seed para criar o administrador local.
+
+Padrao local atual: login `admin` e senha `admin123`.
 
 Troque qualquer senha de ambiente antes de publicar a loja.
 

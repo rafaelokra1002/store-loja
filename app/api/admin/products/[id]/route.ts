@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions, isAdminSession } from "@/lib/auth";
+import { getAuthOptions, isAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PRODUCT_CATEGORIES } from "@/lib/product-categories";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 const updateSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -16,7 +18,7 @@ const updateSchema = z.object({
 });
 
 async function isAdmin() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(getAuthOptions());
   return isAdminSession(session);
 }
 

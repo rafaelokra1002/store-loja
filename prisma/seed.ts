@@ -8,8 +8,8 @@ async function main() {
   const adminPassword = process.env.SEED_ADMIN_PASSWORD?.trim();
 
   if (adminEmail && adminPassword) {
-    if (adminPassword.length < 12) {
-      throw new Error("SEED_ADMIN_PASSWORD deve ter pelo menos 12 caracteres");
+    if (adminPassword.length < 8) {
+      throw new Error("SEED_ADMIN_PASSWORD deve ter pelo menos 8 caracteres");
     }
 
     const hashedPassword = await bcrypt.hash(adminPassword, 12);
@@ -19,7 +19,7 @@ async function main() {
       update: { password: hashedPassword },
       create: {
         email: adminEmail,
-        name: "Admin",
+        name: "admin",
         password: hashedPassword,
         role: "ADMIN",
       },

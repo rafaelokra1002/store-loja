@@ -1,6 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getServerSession } from "next-auth";
-import { authOptions, isFixedAdminSession } from "@/lib/auth";
+import { authOptions, isAdminSession } from "@/lib/auth";
 
 const f = createUploadthing();
 
@@ -9,7 +9,7 @@ export const ourFileRouter = {
     .middleware(async () => {
       const session = await getServerSession(authOptions);
       console.log("[UploadThing] session:", JSON.stringify(session?.user));
-      if (!isFixedAdminSession(session)) {
+      if (!isAdminSession(session)) {
         console.log("[UploadThing] Rejeitado - role:", session?.user?.role);
         throw new Error("Não autorizado");
       }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { authOptions, isFixedAdminSession } from "@/lib/auth";
+import { authOptions, isAdminSession } from "@/lib/auth";
 import { Navbar } from "@/components/navbar";
 
 export default async function AdminLayout({
@@ -10,7 +10,7 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!isFixedAdminSession(session)) {
+  if (!isAdminSession(session)) {
     redirect("/login");
   }
 

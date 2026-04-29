@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions, isFixedAdminSession } from "@/lib/auth";
+import { authOptions, isAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -49,7 +49,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!isFixedAdminSession(session)) {
+  if (!isAdminSession(session)) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 

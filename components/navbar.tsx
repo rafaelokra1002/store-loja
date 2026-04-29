@@ -5,7 +5,6 @@ import { signOut, useSession } from "next-auth/react";
 import { Globe, LogOut, Package, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/components/site-settings-provider";
-import { FIXED_ADMIN_EMAIL } from "@/lib/auth-shared";
 
 export function Navbar() {
   const settings = useSiteSettings();
@@ -47,7 +46,7 @@ export function Navbar() {
                 </Button>
               </Link>
 
-              {session.user.role === "ADMIN" && session.user.email === FIXED_ADMIN_EMAIL ? (
+              {session.user.role === "ADMIN" ? (
                 <Link href="/admin">
                   <Button variant="outline" size="sm">Painel</Button>
                 </Link>

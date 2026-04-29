@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { FIXED_ADMIN_EMAIL } from "@/lib/auth-shared";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Nome muito curto").max(100),
@@ -14,13 +13,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const data = registerSchema.parse(body);
-
-    if (data.email === FIXED_ADMIN_EMAIL) {
-      return NextResponse.json(
-        { error: "Este email é reservado para administração" },
-        { status: 403 }
-      );
-    }
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },

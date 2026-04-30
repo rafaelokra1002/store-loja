@@ -19,6 +19,7 @@ export interface CreateTransactionParams {
   payerDocument: string;
   transactionId: string;
   description: string;
+  webhookUrl?: string;
 }
 
 export interface CreateTransactionResponse {
@@ -40,7 +41,7 @@ export interface CreateTransactionResponse {
 export async function createPixTransaction(
   params: CreateTransactionParams
 ): Promise<CreateTransactionResponse> {
-  const webhookUrl = getMisticPayWebhookUrl();
+  const webhookUrl = params.webhookUrl || getMisticPayWebhookUrl();
 
   const res = await fetch(`${MISTICPAY_API}/transactions/create`, {
     method: "POST",

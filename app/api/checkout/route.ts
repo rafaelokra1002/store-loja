@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(getAuthOptions());
     const body = await request.json();
     const data = checkoutSchema.parse(body);
+    const webhookUrl = new URL("/api/webhook/misticpay", request.url).toString();
 
     const product = await prisma.product.findUnique({
       where: { id: data.productId },
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
       payerDocument: data.payerDocument,
       transactionId,
       description: `Compra: ${product.name}`,
+      webhookUrl,
     });
 
     const order = await prisma.order.create({

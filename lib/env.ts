@@ -28,6 +28,10 @@ export function getNextAuthSecret() {
   return secret;
 }
 
+export function getUploadThingToken() {
+  return getRequiredEnv("UPLOADTHING_TOKEN");
+}
+
 export function getMisticPayWebhookUrl() {
   const explicitWebhookUrl = process.env.MISTICPAY_WEBHOOK_URL?.trim();
 

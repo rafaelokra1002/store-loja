@@ -1,12 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getServerSession } from "next-auth";
 import { getAuthOptions, isAdminSession } from "@/lib/auth";
-import { getUploadThingToken } from "@/lib/env";
 
 const f = createUploadthing();
-
-// Force a clear configuration error before UploadThing returns a generic 500.
-getUploadThingToken();
 
 export const ourFileRouter = {
   productImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })

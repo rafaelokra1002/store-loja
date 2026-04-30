@@ -1,4 +1,5 @@
 import { createRouteHandler } from "uploadthing/next";
+import { getUploadThingToken } from "@/lib/env";
 import { ourFileRouter } from "./core";
 
 const handlers = createRouteHandler({
@@ -10,6 +11,7 @@ function withErrorHandling<T extends (...args: any[]) => Promise<Response>>(
 ) {
   return async (...args: Parameters<T>): Promise<Response> => {
     try {
+      getUploadThingToken();
       return await handler(...args);
     } catch (error) {
       const message =

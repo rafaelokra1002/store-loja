@@ -8,14 +8,14 @@ import {
   X,
   Palette,
   Type,
-  Image as ImageIcon,
   MessageCircle,
-  Link2,
+  ShieldCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { AdminNav } from "@/components/admin-nav";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useUploadThing } from "@/lib/uploadthing";
@@ -63,6 +63,19 @@ export default function SettingsPage() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
+  const [account, setAccount] = useState({
+    currentPassword: "",
+    newName: "",
+    newEmail: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [accountSaving, setAccountSaving] = useState(false);
+  const [accountSaved, setAccountSaved] = useState(false);
+  const [accountError, setAccountError] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -102,6 +115,49 @@ export default function SettingsPage() {
       setError(err.message || "Erro ao salvar");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSaveAccount() {
+    setAccountError("");
+    setAccountSaved(false);
+
+    if (!account.currentPassword) {
+      setAccountError("Informe a senha atual");
+      return;
+    }
+    if (!account.newName && !account.newEmail && !account.newPassword) {
+      setAccountError("Preencha pelo menos um campo para atualizar");
+      return;
+    }
+    if (account.newPassword && account.newPassword !== account.confirmPassword) {
+      setAccountError("As senhas não coincidem");
+      return;
+    }
+
+    setAccountSaving(true);
+    try {
+      const res = await fetch("/api/admin/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: account.currentPassword,
+          ...(account.newName && { newName: account.newName }),
+          ...(account.newEmail && { newEmail: account.newEmail }),
+          ...(account.newPassword && { newPassword: account.newPassword }),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setAccountSaved(true);
+      setAccount({ currentPassword: "", newName: "", newEmail: "", newPassword: "", confirmPassword: "" });
+      setTimeout(() => setAccountSaved(false), 3000);
+    } catch (err: any) {
+      setAccountError(err.message || "Erro ao atualizar conta");
+    } finally {
+      setAccountSaving(false);
     }
   }
 
@@ -458,6 +514,104 @@ export default function SettingsPage() {
                 placeholder="https://t.me/..."
               />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Account */}
+      <Card className="border-zinc-800">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-zinc-100">
+            <ShieldCheck className="h-5 w-5 text-yellow-400" />
+            Conta do Admin
+          </CardTitle>
+          <CardDescription>Altere seu usuário e senha de acesso</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Senha Atual <span className="text-red-400">*</span></Label>
+            <div className="relative">
+              <Input
+                type={showCurrentPassword ? "text" : "password"}
+                value={account.currentPassword}
+                onChange={(e) => setAccount({ ...account, currentPassword: e.target.value })}
+                placeholder="Digite sua senha atual"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+              >
+                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Novo Usuário</Label>
+              <Input
+                value={account.newName}
+                onChange={(e) => setAccount({ ...account, newName: e.target.value })}
+                placeholder="Deixe em branco para não alterar"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Novo Email</Label>
+              <Input
+                type="email"
+                value={account.newEmail}
+                onChange={(e) => setAccount({ ...account, newEmail: e.target.value })}
+                placeholder="Deixe em branco para não alterar"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Nova Senha</Label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={account.newPassword}
+                  onChange={(e) => setAccount({ ...account, newPassword: e.target.value })}
+                  placeholder="Mínimo 8 caracteres"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Confirmar Nova Senha</Label>
+              <Input
+                type="password"
+                value={account.confirmPassword}
+                onChange={(e) => setAccount({ ...account, confirmPassword: e.target.value })}
+                placeholder="Repita a nova senha"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div>
+              {accountSaved && (
+                <span className="text-sm text-neon-green animate-fade-in">✓ Conta atualizada!</span>
+              )}
+              {accountError && (
+                <span className="text-sm text-red-400">{accountError}</span>
+              )}
+            </div>
+            <Button onClick={handleSaveAccount} disabled={accountSaving} className="gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              {accountSaving ? "Salvando..." : "Atualizar Conta"}
+            </Button>
           </div>
         </CardContent>
       </Card>

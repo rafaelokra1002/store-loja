@@ -14,7 +14,7 @@ const schema = z.object({
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(getAuthOptions());
-  if (!isAdminSession(session)) {
+  if (!isAdminSession(session) || !session) {
     return Response.json({ error: "Não autorizado" }, { status: 401 });
   }
 
